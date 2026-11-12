@@ -6,6 +6,16 @@
 
 /** Canonical Kiro API IDs (dot form) accepted by the server. */
 export const KIRO_MODEL_IDS = new Set<string>([
+  "claude-opus-5.5",
+  "claude-sonnet-5.5",
+  "claude-haiku-5.5",
+  "claude-opus-5",
+  "claude-sonnet-5",
+  "claude-opus-4.8",
+  "gpt-5.6-sol",
+  "gpt-5.6-terra",
+  "gpt-5.6-luna",
+  "glm-5",
   "claude-opus-4.7",
   "claude-opus-4.6",
   "claude-opus-4.6-1m",
@@ -67,6 +77,16 @@ export function resolveApiRegion(ssoRegion: string | undefined): string {
  */
 const MODELS_BY_REGION: Record<string, Set<string>> = {
   "us-east-1": new Set([
+    "claude-opus-5-5",
+    "claude-sonnet-5-5",
+    "claude-haiku-5-5",
+    "claude-opus-5",
+    "claude-sonnet-5",
+    "claude-opus-4-8",
+    "gpt-5-6-sol",
+    "gpt-5-6-terra",
+    "gpt-5-6-luna",
+    "glm-5",
     "claude-opus-4-7",
     "claude-opus-4-6",
     "claude-opus-4-6-1m",
@@ -89,6 +109,16 @@ const MODELS_BY_REGION: Record<string, Set<string>> = {
     "auto",
   ]),
   "eu-central-1": new Set([
+    "claude-opus-5-5",
+    "claude-sonnet-5-5",
+    "claude-opus-5",
+    "claude-sonnet-5",
+    "claude-opus-4-8",
+    // GPT-5.6 is served from the US geography even for EU profiles.
+    "gpt-5-6-sol",
+    "gpt-5-6-terra",
+    "gpt-5-6-luna",
+    "glm-5",
     "claude-opus-4-7",
     "claude-opus-4-6",
     "claude-sonnet-4-6",
@@ -117,7 +147,11 @@ export function filterModelsByRegion<T extends { id: string }>(
   return models.filter((m) => allowed.has(m.id));
 }
 
-const BASE_URL = "https://q.us-east-1.amazonaws.com/generateAssistantResponse";
+const BASE_URL = "https://runtime.us-east-1.kiro.dev/generateAssistantResponse";
+const BASE_URL_EU = "https://runtime.eu-central-1.kiro.dev/generateAssistantResponse";
+// Legacy endpoint used only for ListAvailableProfiles (profileArn resolution).
+// The runtime.kiro.dev endpoints do not support this operation.
+export const PROFILE_RESOLUTION_URL = "https://q.us-east-1.amazonaws.com/";
 const ZERO_COST = Object.freeze({ input: 0, output: 0, cacheRead: 0, cacheWrite: 0 });
 
 /** Fields every Kiro model shares. Spread into each literal below. */
@@ -159,6 +193,115 @@ export interface KiroModel {
 }
 
 export const kiroModels: KiroModel[] = [
+  // Claude 4.7+ and GPT-5.6 hide reasoning from clients (adaptive thinking
+  // display "omitted" / hidden chain-of-thought), so they use reasoningHidden
+  // and the longer first-token timeout like Opus 4.7.
+  {
+    ...KIRO_DEFAULTS,
+    id: "claude-opus-5-5",
+    name: "Claude Opus 5.5",
+    reasoning: true,
+    reasoningHidden: true,
+    input: MULTIMODAL,
+    contextWindow: 1_000_000,
+    maxTokens: 128_000,
+    firstTokenTimeout: 180_000,
+  },
+  {
+    ...KIRO_DEFAULTS,
+    id: "claude-sonnet-5-5",
+    name: "Claude Sonnet 5.5",
+    reasoning: true,
+    reasoningHidden: true,
+    input: MULTIMODAL,
+    contextWindow: 1_000_000,
+    maxTokens: 65_536,
+    firstTokenTimeout: 180_000,
+  },
+  {
+    ...KIRO_DEFAULTS,
+    id: "claude-haiku-5-5",
+    name: "Claude Haiku 5.5",
+    reasoning: false,
+    input: MULTIMODAL,
+    contextWindow: 200_000,
+    maxTokens: 65_536,
+  },
+  {
+    ...KIRO_DEFAULTS,
+    id: "claude-opus-5",
+    name: "Claude Opus 5",
+    reasoning: true,
+    reasoningHidden: true,
+    input: MULTIMODAL,
+    contextWindow: 1_000_000,
+    maxTokens: 128_000,
+    firstTokenTimeout: 180_000,
+  },
+  {
+    ...KIRO_DEFAULTS,
+    id: "claude-sonnet-5",
+    name: "Claude Sonnet 5",
+    reasoning: true,
+    reasoningHidden: true,
+    input: MULTIMODAL,
+    contextWindow: 1_000_000,
+    maxTokens: 65_536,
+    firstTokenTimeout: 180_000,
+  },
+  {
+    ...KIRO_DEFAULTS,
+    id: "claude-opus-4-8",
+    name: "Claude Opus 4.8",
+    reasoning: true,
+    reasoningHidden: true,
+    input: MULTIMODAL,
+    contextWindow: 1_000_000,
+    maxTokens: 128_000,
+    firstTokenTimeout: 180_000,
+  },
+  {
+    ...KIRO_DEFAULTS,
+    id: "gpt-5-6-sol",
+    name: "GPT-5.6 Sol",
+    reasoning: true,
+    reasoningHidden: true,
+    input: MULTIMODAL,
+    contextWindow: 1_000_000,
+    maxTokens: 128_000,
+    firstTokenTimeout: 180_000,
+  },
+  {
+    ...KIRO_DEFAULTS,
+    id: "gpt-5-6-terra",
+    name: "GPT-5.6 Terra",
+    reasoning: true,
+    reasoningHidden: true,
+    input: MULTIMODAL,
+    contextWindow: 1_000_000,
+    maxTokens: 128_000,
+    firstTokenTimeout: 180_000,
+  },
+  {
+    ...KIRO_DEFAULTS,
+    id: "gpt-5-6-luna",
+    name: "GPT-5.6 Luna",
+    reasoning: true,
+    reasoningHidden: true,
+    input: MULTIMODAL,
+    contextWindow: 1_000_000,
+    maxTokens: 128_000,
+    firstTokenTimeout: 180_000,
+  },
+  {
+    ...KIRO_DEFAULTS,
+    id: "glm-5",
+    name: "GLM-5",
+    reasoning: true,
+    input: TEXT_ONLY,
+    contextWindow: 200_000,
+    maxTokens: 8_192,
+  },
   {
     ...KIRO_DEFAULTS,
     id: "claude-opus-4-7",

@@ -1,5 +1,21 @@
 # Changelog
 
+## Unreleased
+
+- Add Claude Opus 5.5, Sonnet 5.5, Opus 5, Sonnet 5, Opus 4.8, GPT-5.6
+  Sol/Terra/Luna, and GLM-5 to the model catalog and US/EU region
+  allowlists. Previously these were rejected by `resolveKiroModel` and
+  filtered out of the model list.
+- Point `pi.extensions` at `./src/extension.ts` so the package can be
+  installed straight from git (`pi install git:github.com/...`) without
+  a build step; `dist/` is gitignored.
+- Fix `400 Invalid tool use format` on every request under pi >= 1.0.
+  pi now sends the system prompt and tools as `role: "system"` transcript
+  messages; these fell through to the tool-result branch and became an
+  empty tool result with no `toolUseId`. They're now replayed into a
+  single prompt + tool set (`resolveSystemContext`), with the legacy
+  `context.systemPrompt` / `context.tools` fields still supported.
+
 ## 0.1.3
 
 - Drop `@mariozechner/pi-coding-agent` as a dependency and peer. pi-kiro
